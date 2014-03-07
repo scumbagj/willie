@@ -6,11 +6,9 @@ Licensed under the Eiffel Forum License 2
 http://willie.dftba.net
 """
 from __future__ import unicode_literals
-
 import json
 from lxml import etree
 import re
-
 from willie import web
 from willie.module import commands, example, NOLIMIT
 
@@ -27,6 +25,7 @@ regex = re.compile(r'''
 
 
 def get_rate(code):
+    code = code.upper()
     if code == 'CAD':
         return 1, 'Canadian Dollar'
     elif code == 'BTC':
@@ -51,12 +50,15 @@ def get_rate(code):
 @example('.cur 20 EUR in USD')
 def exchange(bot, trigger):
     """Show the exchange rate between two currencies"""
-    match = regex.match(trigger.group(2))
+    try: 
+        match = regex.match(trigger.group(2))
+    except TypeError:
+        bot.reply("Please input a valid amount")
+        return NOLIMIT
     if not match:
         # It's apologetic, because it's using Canadian data.
         bot.reply("Sorry, I didn't understand the input.")
         return NOLIMIT
-
     amount, of, to = match.groups()
     try:
         amount = float(amount)
